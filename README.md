@@ -17,7 +17,7 @@ clone the repo on your desktop using `git clone https://github.com/H27-VEN/sp-te
 
 `cd sp-test-app`
 
-Now using your Favourite package manager `npm` or `yarn` to install dependencies 
+Now use your Favourite package manager `npm` or `yarn` to install dependencies 
 
 `sp-test-app>npm install`
 
