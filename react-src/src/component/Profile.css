@@ -1,0 +1,15 @@
+
+.user-details img {
+    width: 150px;
+    height: 150px;
+    float:left;
+}
+
+
+.user-details img {
+    margin-right: 1%;
+}
+
+li button {
+    margin: 1%;
+}
