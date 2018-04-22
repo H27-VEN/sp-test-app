@@ -6,6 +6,7 @@ Now before moving toward installation there are certain **assumptions** that I h
 1. This is complete front end app and I have written backend code just for the simulation purpose.
 2. The user data is stored in an array in the backend and will be lost once the server is restarted.
 3. And since the data is stored temporarily there is no session management or other nifty backend features.
+4. Validations are performed only on client side. 
 
 now that's out of the way lets move towards Installation.
 
