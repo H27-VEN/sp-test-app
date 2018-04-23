@@ -2,33 +2,39 @@ import React, { Component } from 'react';
 /* import { connect } from "react-redux";
 import { REGISTER_USER } from '../actiontypes'; */
 import './Register.css';
-
+import nophoto from '../nophoto.jpg';
+import $ from 'jquery'; 
+ 
 
 class Register extends Component {
 
     constructor(props) {
         super(props);
         console.log(props);
-        this.register = {name: '', email: '', password: '', repassword: '', hobbies: [], gender: ''};
+        this.register = {name: '', email: '', password: '', repassword: '', hobbies: [], gender: '', profile_pic: ''};
         this.state = {
             name: '',
             email: '',
             password: '',
             repassword: '',
             hobbies: {reading: false, movies: false, sports: false},
-            gender: 'male',
+            gender: '',
             email_error: '',
             password_error: '',
             repassword_error: '',
+            male: false,
+            female: false,
             warning_email: 'hide',
             warning_password: 'hide',
             warning_repassword: 'hide',
             disable: true,
-            registerationComplete: 'hide',
-            registerationCompleteText: '',
+            formsubmitalert: 'hide',
+            formsubmittext: '',
             invalidid: false,
             editid: '',
             btntext: 'Register',
+            profile_pic_url: nophoto,
+            profile_pic_file: '',
             formmethod: this.registerUser.bind(this),
             
             
@@ -59,8 +65,26 @@ class Register extends Component {
                     this.register[event.target.name] = event.target.value;
                 }
             break;
+
+            case 'profile_pic':
+                console.log(this.register[event.target.name]);
+                
+                let reader = new FileReader();
+                let file = event.target.files[0];
+                this.register[event.target.name] = file;
+                reader.readAsDataURL(file);
+                let self = this;
+                reader.onload = function (e) {
+                    self.setState({
+                        profile_pic_url: e.target.result
+                    });  
+                };
+       
+            break;
             
             default:
+                console.log('in default case');
+                console.log(this.register[event.target.name]);
                 this.register[event.target.name] = event.target.value;
             break;
         }
@@ -76,10 +100,18 @@ class Register extends Component {
                 }
             }
         }
-        else {
-            console.log(event);
+        else if(event.target.name === 'gender') {
             console.log('target name: ' + event.target.name);
             console.log('target value: ' + event.target.value);
+            this.setState({
+                [event.target.name]: event.target.value 
+            })
+            this.register.gender = event.target.value;
+
+        }
+        else {
+            //console.log(event);
+            
 
             this.setState({
                 [event.target.name]: event.target.value
@@ -98,7 +130,7 @@ class Register extends Component {
         }
            
         console.log(this.state);
-        console.log('register: '+this.register);
+        console.log('register: ',this.register);
     }
 
     validate(name, value) {
@@ -189,11 +221,16 @@ class Register extends Component {
 
             return(
                 <div className="container">
-                    <div className={this.state.registerationComplete}>
+                    <div className={this.state.formsubmitalert}>
                         <a href="#" className="close" data-dismiss="alert">&times;</a>
-                        <strong>{this.state.registerationCompleteText}</strong>
+                        <strong>{this.state.formsubmittext}</strong>
                     </div>
-                    <form ref="user_form" onSubmit={this.state.formmethod}>
+                    <form id="userform" onSubmit={this.state.formmethod}>
+
+                        <div className="form-group">
+                            <img src={this.state.profile_pic_url}  alt="profile_photo" width="160" height="160" />
+                        </div>
+
                         <div className="form-group">
                             <label>Name:</label>
                             <input type="text" className="form-control" id="name" name="name" placeholder="name" value={this.state.name} minLength="3"  onChange={this.change} required />
@@ -214,7 +251,7 @@ class Register extends Component {
 
                         <div className="form-group">
                             <label>Retype Password:</label>
-                            <input type="password" className="form-control" id="repassword" name="repassword" placeholder="Password" minLength="8" maxLength="16"  value={this.state.repassword} onChange={this.change} required />
+                            <input type="password" className="form-control" id="repassword" name="repassword" placeholder="Retype Password" minLength="8" maxLength="16"  value={this.state.repassword} onChange={this.change} required />
                             <div className={this.state.warning_repassword} role="alert">{this.state.repassword_error}</div>
                         </div>
                             
@@ -238,12 +275,21 @@ class Register extends Component {
                         <div className="form-group">
                             <label>Gender:</label>
                             <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="radio" name="gender" id="Male" value="male" onChange={this.change} defaultChecked={true} required/>
+                                <input className="form-check-input" type="radio" name="gender" id="male" value="male" onChange={this.change} defaultChecked={this.state.male} required/>
                                 <label className="form-check-label">Male</label>
                             </div>
                             <div className="form-check form-check-inline">
-                                <input className="form-check-input" type="radio" name="gender" id="Female" value="female" onChange={this.change} defaultChecked={false} required/>
+                                <input className="form-check-input" type="radio" name="gender" id="female" value="female" onChange={this.change} defaultChecked={this.state.female} required/>
                                 <label className="form-check-label">Female</label>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <div className="custom-file" id="customFile" lang="es">
+                                <input type="file" class="custom-file-input" id="profile_pic" name="profile_pic" accept=".jpg, .jpeg, .png" onChange={this.change} />
+                                    <label className="custom-file-label" for="exampleInputFile">
+                                        Select file...
+                                    </label>
                             </div>
                         </div>
                             
@@ -256,28 +302,57 @@ class Register extends Component {
 
     update(event) {
         event.preventDefault();
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:5000/data/update/user');
+       
         let self = this;
-        xhr.onload = () => {
-            console.log(xhr.responseText);
-            let res = JSON.parse(xhr.responseText);
-            if (res.result === 'done') {
-                self.setState({
-                    updationComplete: 'alert alert-success fade in',
-                    updationCompleteText: 'Data updated successfully!'
-                });
+        let formData = new FormData();
+        for (const key in this.register) {
+            if (this.register.hasOwnProperty(key)) {
+                if (key === 'profile_pic')
+                    formData.append(key, this.register[key], this.register[key].name);
+                else
+                    formData.append(key, this.register[key]);
             }
         }
-        xhr.onerror = () => {
 
+        formData.append('id', this.state.editid);
+        
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/data/update/user',
+            data: formData,
+            contentType: false,
+            processData: false
+        }).done(function (data) {
+
+            console.log(data);
+            let response = JSON.parse(data);
+            if (response.result === 'done') {
+                self.setState({
+                    formsubmitalert: 'alert alert-success',
+                    formsubmittext: 'User Registered Successfully!',
+                    name: '',
+                    email: '',
+                    password: '',
+                    repassword: '',
+                    hobbies: { reading: false, movies: false, sports: false },
+                    gender: '',
+                    profile_pic_url: nophoto
+                });
+
+                document.getElementById('reading').checked = false;
+                document.getElementById('movies').checked = false;
+                document.getElementById('sports').checked = false;
+                document.getElementById('male').checked = false;
+                document.getElementById('female').checked = false;
+            }
+
+        }).fail(function (data) {
+            console.log('Error');
             self.setState({
-                registerationComplete: 'alert alert-danger fade in',
-                registerationCompleteText: 'Error during Updation'
+                formsubmitalert: 'alert alert-danger',
+                formsubmittext: 'Error during Registeration'
             });
-        }
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('userdetails=' + JSON.stringify(this.register) + '&id='+this.state.editid);
+        });
     }
 
 
@@ -301,24 +376,33 @@ class Register extends Component {
             console.log(xhr.responseText);
             let response = JSON.parse(xhr.responseText);
             if(response.result === 'done') {
+                let myhobbies = response.response.hobbies.split(',');
                 let hobbies = {reading: false, sports: false, movies: false};
-                response.response.hobbies.forEach((currentValue, index) => {
+                myhobbies.forEach((currentValue, index) => {
                     console.log('hobbies current value: ' + currentValue);
+                    document.getElementById(currentValue).checked = true;
+
                     hobbies[currentValue] = true;
+
                 });
+                console.log('hobbies: ',hobbies);
+                console.log('gender: '  ,response.response.gender);
+                document.getElementById(response.response.gender).checked = true;
                 self.setState({
                     status: 'success',
                     name: response.response.name,
                     email: response.response.email,
                     password: response.response.password,
                     repassword: response.response.password,
-                    hobbies: hobbies,
-                    gender: response.response.gender || 'male',
+                    hobbies:  hobbies,
+                    gender: response.response.gender,
+                    [response.response.gender]: true,
                     editid: id,
                     btntext: 'Update',
+                    profile_pic_url: response.response.profile_pic_url,
                     formmethod: self.update.bind(this),
                 });
-
+                console.log('state',this.state);
                 this.register = response.response;
 
             }
@@ -341,70 +425,61 @@ class Register extends Component {
 
     registerUser(event) {
         event.preventDefault();
-        this.setState({
-            registerationComplete: 'hide'
-        })
-        this.refs.user_form.reset();
-        let xhr = new XMLHttpRequest();
-        let form = document.getElementById("registeration_form");
-        xhr.open('POST', 'http://localhost:5000/data/register/user');
         let self = this;
-        xhr.onload = () => {
-            console.log(xhr.responseText);
-            let res = JSON.parse(xhr.responseText);
-            if(res.result === 'done') {
-                self.setState({
-                    registerationComplete: 'alert alert-success fade in',
-                    registerationCompleteText: 'User Registered Successfully!'
-                });
+        let formData = new FormData();
+        for (const key in this.register) {
+            if (this.register.hasOwnProperty(key)) {
+                if(key === 'profile_pic')
+                    formData.append(key, this.register[key], this.register[key].name);
+                else
+                    formData.append(key, this.register[key]);
             }
         }
-        xhr.onerror = () => {
+       
 
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/data/register/user',
+            data: formData,
+            contentType: false,
+            processData: false
+        }).done(function (data) {
+            
+            console.log(data);
+            let response = JSON.parse(data);
+            if (response.result === 'done') {
+                self.setState({
+                    formsubmitalert: 'alert alert-success',
+                    formsubmittext: 'User Registered Successfully!',
+                    name: '',
+                    email: '',
+                    password: '',
+                    repassword: '',
+                    hobbies: { reading: false, movies: false, sports: false },
+                    gender: '',
+                    profile_pic_url: nophoto
+                });
+                
+                document.getElementById('reading').checked = false;
+                document.getElementById('movies').checked = false;
+                document.getElementById('sports').checked = false;
+                document.getElementById('male').checked = false;
+                document.getElementById('female').checked = false;
+            }
+
+        }).fail(function (data) {
+            console.log('Error');
             self.setState({
-                registerationComplete: 'alert alert-danger fade in',
-                registerationCompleteText: 'Error during Registeration'
+                formsubmitalert: 'alert alert-danger',
+                formsubmittext: 'Error during Registeration'
             });
-        }        
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('userdetails='+JSON.stringify(this.register));
+        });
+       
     }
-
-
 
 }
 
-/* const mapStateToProps = (state) => {
-    return {
-        user_registed: state.list_reducer,
-    };
-};
 
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        registerUser: (userDetails) => {
-            console.log('--- In registerUser ');
-            console.log(userDetails);
-            dispatch({
-                type: REGISTER_USER,
-                payload: new Promise((resolve, reject) => {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'http://localhost:5000/data/register/user');
-                    xhr.onload = () => {
-                        resolve(xhr.responseText);
-                    }
-                    xhr.onerror = () => {
-                        reject(xhr.statusText);
-                    }
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.send('userdetails='+JSON.stringify(userDetails));
-                }) 
-            });
-        }
-    };
-};
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(Register); */
 export default Register;

@@ -28,11 +28,11 @@ class Profile extends Component {
                 for(let i = 0; i < this.state.response.length; i++) {
                     listItems[i] = <li className="list-group-item" key={this.state.response[i].email}>
                                         <div className="user-details">
-                                            <img src={nophoto} alt="profile photo" />
+                                            <img src={this.state.response[i].profile_pic_url} alt="profile photo" />
                                             <h2 className="name">{this.state.response[i].name}</h2>
                                             <h5 className="email">Email: {this.state.response[i].email}</h5>
                                             <p className="gender">Gender: {this.state.response[i].gender}</p>
-                                            <p className="hobbies">Hobbies: {this.state.response[i].hobbies.join(', ')}</p>
+                                            <p className="hobbies">Hobbies: {this.state.response[i].hobbies}</p>
                                         </div>
                                         <Link to={'profile/edit/'+i} className="btn btn-md btn-primary">Edit</Link>
                                         <button type="button" className="btn btn-md btn-primary" data-id={this.state.response[i].email} onClick={this.deleteUser}>Delete</button>

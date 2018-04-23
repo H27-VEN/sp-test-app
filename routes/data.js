@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+var multer = require('multer');
+var fs = require('fs');
+
+var upload = multer({ dest: 'uploads/' })
 
 userRegisterList = [];
 userLoginDetails = { userid: 'hardik123', password: 'password' };
@@ -27,25 +31,69 @@ router.post('/fetch/specific', function(req, res) {
 });
 
 
-router.post('/register/user', function(req, res) {
-    console.log('/register/user');  
-    userRegisterList.push(JSON.parse(req.body.userdetails));
-    res.send(JSON.stringify({result: 'done' }))
+router.post('/register/user', upload.single('profile_pic'), function(req, res) {
+    console.log('/register/user'); 
+    console.log('body: ', req.body);
+    console.log('file: ', req.file);
+    console.log('file: ', req.file.path);
+    
+    let tmp_path = req.file.path;
+    let file_name = Date.now() + '_' + req.file.originalname;
+    let target_path = 'uploads/' + file_name;
+    let src = fs.createReadStream(tmp_path);
+    let dest = fs.createWriteStream(target_path);
+    src.pipe(dest);
+    src.on('end', function () { 
+        console.log('-- end --');
+        console.log('req.body: ',req.body);
+        let userData = req.body;
+        console.log('userData', userData);
+        userData.profile_pic_url = 'http://localhost:5000/' + file_name;
+        console.log('userData profile_pic: ',userData.profile_pic_url);
+        userRegisterList.push(userData);
+        res.send(JSON.stringify({ result: 'done' }));   
+    });
+    src.on('error', function (err) { 
+        console.log('-- error --');
+        res.send(JSON.stringify({ result: 'error', response: 'error uploading file' })); 
+    });
+    
 });
 
-router.post('/update/user', function(req, res) {
-    console.log('in /update/user');
-    console.log(req.body);
-    console.log('userdetails: ' + req.body.userdetails);
-    console.log('id: ' + req.body.id);
-    let id = parseInt(req.body.id);
-    if(id < userRegisterList.length) {
-        userRegisterList.splice(id, 1, JSON.parse(req.body.userdetails));
-        res.send(JSON.stringify({result: 'done'}));
-    }
+router.post('/update/user', upload.single('profile_pic'), function(req, res) {
+    console.log('/update/user');
+    console.log('body: ', req.body);
+    console.log('file: ', req.file);
+    console.log('file: ', req.file.path);
+
+    let tmp_path = req.file.path;
+    let file_name = Date.now() + '_' + req.file.originalname;
+    let target_path = 'uploads/' + file_name;
+    let src = fs.createReadStream(tmp_path);
+    let dest = fs.createWriteStream(target_path);
+    src.pipe(dest);
+    src.on('end', function () {
+        console.log('-- end --');
+        console.log('req.body: ', req.body);
+        let userData = req.body;
+        console.log('userData', userData);
+        userData.profile_pic_url = 'http://localhost:5000/' + file_name;
+        console.log('userData profile_pic: ', userData.profile_pic_url);
+        id = parseInt(userData.id);
+        if(id < userRegisterList.length) {
+            userRegisterList.splice(id, 1, userData);
+            res.send(JSON.stringify({ result: 'done' }));
+        }
+              
+    });
+    src.on('error', function (err) {
+        console.log('-- error --');
+        res.send(JSON.stringify({ result: 'error', response: 'error uploading file' }));
+    });
 
 });
 
+    
 router.post('/delete/user', function(req, res) {
     console.log('in /delete/user');
     console.log(req.body.email);
