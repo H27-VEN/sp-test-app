@@ -71,3 +71,7 @@ User Registeration
 User Delete.
 
 [Imgur](https://i.imgur.com/EqmyVjr.gif)
+
+User Update.
+
+[Imgur](https://i.imgur.com/aCX814f.gif)
