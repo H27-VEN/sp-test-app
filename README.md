@@ -66,6 +66,4 @@ ReactJS server runs at port 3000 by default
 # Preview
 User Registeration
 
-
-<blockquote class="imgur-embed-pub" lang="en" data-id="a/ax42w6q"><a href="//imgur.com/ax42w6q"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
-
+<a href="//imgur.com/ax42w6q"></a>
