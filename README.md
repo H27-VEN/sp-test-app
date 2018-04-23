@@ -66,4 +66,4 @@ ReactJS server runs at port 3000 by default
 # Preview
 User Registeration
 
-[Imgur](https://i.imgur.com/lW1Caym.gifv)
+[Imgur](https://i.imgur.com/lW1Caym.gif)
