@@ -2,6 +2,8 @@ Basic crud application with reactJS as front-end and NodeJS and Express for capt
 
 Now before moving toward installation there are certain **assumptions** that I have made which I will clarify below
 
+
+
 # Assumptions
 1. This is complete front end app and I have written backend code just for the simulation purpose.
 2. The user data is stored in an array in the backend and will be lost once the server is restarted.
@@ -61,6 +63,7 @@ ReactJS server runs at port 3000 by default
 
 
 
+# Preview
+User Registeration
 
-
-
+[Imgur](https://i.imgur.com/lW1Caym.gif)
